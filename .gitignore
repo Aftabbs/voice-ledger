@@ -1,0 +1,10 @@
+.env
+.env.*
+node_modules/
+dist/
+__pycache__/
+*.webm
+*.wav
+phase0/recordings/
+phase0/results/
+PLAN.md

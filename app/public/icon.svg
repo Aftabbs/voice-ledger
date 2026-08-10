@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <rect width="100" height="100" rx="22" fill="#0f1420"/>
+  <circle cx="50" cy="44" r="24" fill="#38b26a"/>
+  <rect x="44" y="30" width="12" height="20" rx="6" fill="#fff"/>
+  <path d="M38 46a12 12 0 0 0 24 0" stroke="#fff" stroke-width="4" fill="none" stroke-linecap="round"/>
+  <line x1="50" y1="58" x2="50" y2="64" stroke="#fff" stroke-width="4" stroke-linecap="round"/>
+  <text x="50" y="88" font-family="system-ui" font-size="16" font-weight="700" fill="#93a0b4" text-anchor="middle">₹ खाता</text>
+</svg>

@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phase 0 Recorder — VoiceLedger</title>
+<style>
+  :root { color-scheme: light dark; }
+  body { font-family: system-ui, sans-serif; max-width: 480px; margin: 0 auto; padding: 16px; }
+  h1 { font-size: 1.2rem; }
+  .utt { font-size: 1.3rem; font-weight: 600; margin: 16px 0; min-height: 4em; }
+  .meta { color: gray; font-size: 0.9rem; }
+  button { font-size: 1.1rem; padding: 14px 22px; margin: 6px; border-radius: 12px; border: 1px solid #888; cursor: pointer; min-width: 44px; min-height: 44px; }
+  #recBtn.recording { background: #c0392b; color: white; }
+  #status { margin: 12px 0; font-weight: 600; }
+  progress { width: 100%; }
+</style>
+</head>
+<body>
+<h1>VoiceLedger — Phase 0 Recorder</h1>
+<p class="meta">Speak naturally, like a busy merchant. Files download as <code>utt_XX.webm</code> — collect them into <code>phase0/recordings/</code>.</p>
+<progress id="prog" max="50" value="0"></progress>
+<div class="meta" id="counter">Utterance 1 / 50</div>
+<div class="utt" id="uttText"></div>
+<div>
+  <button id="prevBtn" aria-label="Previous">◀</button>
+  <button id="recBtn">🎙 Record</button>
+  <button id="nextBtn" aria-label="Next">▶</button>
+</div>
+<div id="status" role="status" aria-live="polite"></div>
+
+<script>
+const UTTERANCES = [
+"Ramesh ko paanch sau ka saman diya udhaar",
+"Suresh bhai ko do sau pachaas ka udhaar likh do",
+"Sharma ji ne baarah sau ka maal liya baad mein denge",
+"Pooja ko teen sau ka kirana udhaar pe diya",
+"Anil ko 750 ka saman udhaar",
+"Gupta ji ko ek hazaar ka maal diya credit pe",
+"Rekha didi ne sau rupay ka saman liya udhaar mein",
+"Vijay ko saade chaar sau ka udhaar",
+"Mohan lal ko pandrah sau ka saman baaki mein diya",
+"Kiran ko do sau ka doodh aur bread udhaar",
+"Ashok bhai ka aaj ka udhaar chhe sau rupay",
+"Santosh ko atta chawal diya total aath sau, udhaar likho",
+"Meena ji ne 350 ka saman liya, paise baad mein",
+"Rahul ko nabbe rupay ka udhaar",
+"Prakash ji ko dhai hazaar ka maal udhaar pe diya",
+"Ramesh ne paanch sau de diye",
+"Suresh se do sau mile aaj",
+"Sharma ji ne udhaar ka ek hazaar wapas kiya",
+"Pooja ne teen sau jama karaye",
+"Anil se saat sau pachaas aa gaye",
+"Gupta ji ne poora hisaab clear kar diya, ek hazaar",
+"Vijay ne 450 cash diye",
+"Mohan lal se paanch sau mile, hazaar abhi baaki",
+"Kiran ne do sau lauta diye",
+"Santosh se chaar sau received",
+"Aaj ek sau saath ka cash sale hua",
+"Do sau ka saman becha cash mein",
+"Customer ne 85 rupay ka biscuit aur namkeen liya",
+"Paanch sau ka bill bana cash ka",
+"Tel aur sabun becha total 320",
+"Ek grahak ne 1250 ka saman kharida",
+"Sattar rupay ki maggi aur chips",
+"Aaj subah ka pehla sale 45 rupay",
+"Aaj bijli ka bill bhara pandrah sau",
+"Wholesale se maal aaya paanch hazaar ka",
+"Tempo wale ko sau rupay diye",
+"Dukaan ka kiraya diya aath hazaar",
+"Chai nashta kharcha pachaas rupay",
+"Ladke ki pagaar di teen hazaar",
+"Recharge karaya do sau nintyanve ka",
+"Ramesh ka kitna udhaar baaki hai",
+"Aaj ka total kitna hua",
+"Sharma ji ka hisaab batao",
+"Is mahine kitna udhaar diya total",
+"Kis kis ka paisa baaki hai",
+"Rameshla paachshe rupayacha maal udhaar dila (Marathi)",
+"Sureshne donshe rupaye dile (Marathi)",
+"Aaj tinshe rupayachi vikri jhali (Marathi)",
+"Light bill bharla hazaar rupaye (Marathi)",
+"Rameshcha kiti udhaar baaki aahe (Marathi)"
+];
+
+let idx = 0, mediaRecorder = null, chunks = [];
+const uttText = document.getElementById("uttText");
+const counter = document.getElementById("counter");
+const prog = document.getElementById("prog");
+const status = document.getElementById("status");
+const recBtn = document.getElementById("recBtn");
+
+function render() {
+  uttText.textContent = (idx + 1) + ". " + UTTERANCES[idx];
+  counter.textContent = `Utterance ${idx + 1} / ${UTTERANCES.length}`;
+  prog.value = idx;
+}
+
+async function toggleRecord() {
+  if (mediaRecorder && mediaRecorder.state === "recording") {
+    mediaRecorder.stop();
+    return;
+  }
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+  chunks = [];
+  mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm" });
+  mediaRecorder.ondataavailable = e => chunks.push(e.data);
+  mediaRecorder.onstop = () => {
+    stream.getTracks().forEach(t => t.stop());
+    const blob = new Blob(chunks, { type: "audio/webm" });
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = `utt_${String(idx + 1).padStart(2, "0")}.webm`;
+    a.click();
+    URL.revokeObjectURL(a.href);
+    recBtn.textContent = "🎙 Record";
+    recBtn.classList.remove("recording");
+    status.textContent = `Saved utt_${String(idx + 1).padStart(2, "0")}.webm ✓`;
+    if (idx < UTTERANCES.length - 1) { idx++; render(); }
+  };
+  mediaRecorder.start();
+  recBtn.textContent = "⏹ Stop";
+  recBtn.classList.add("recording");
+  status.textContent = "Recording… speak now";
+}
+
+recBtn.addEventListener("click", () => toggleRecord().catch(e => status.textContent = "Mic error: " + e.message));
+document.getElementById("nextBtn").addEventListener("click", () => { if (idx < UTTERANCES.length - 1) { idx++; render(); } });
+document.getElementById("prevBtn").addEventListener("click", () => { if (idx > 0) { idx--; render(); } });
+render();
+</script>
+</body>
+</html>
