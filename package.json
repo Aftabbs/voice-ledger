@@ -1,0 +1,17 @@
+{
+  "name": "voiceledger",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Voice-first ledger for India's small merchants. Speak a transaction, get it back structured, confirmed, and spoken.",
+  "license": "MIT",
+  "scripts": {
+    "setup": "npm install && npm install --prefix server && npm install --prefix app",
+    "dev:server": "npm run dev --prefix server",
+    "dev:web": "npm run dev --prefix app",
+    "dev": "concurrently -n server,web -c yellow,green \"npm:dev:server\" \"npm:dev:web\"",
+    "build": "npm run build --prefix app"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
+  }
+}

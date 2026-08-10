@@ -1,7 +1,8 @@
 {
-  "name": "app",
+  "name": "voiceledger-web",
   "private": true,
-  "version": "0.0.0",
+  "version": "0.1.0",
+  "description": "Voice-first ledger PWA for Indian small merchants",
   "type": "module",
   "scripts": {
     "dev": "vite",

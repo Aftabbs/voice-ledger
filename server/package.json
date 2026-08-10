@@ -1,0 +1,15 @@
+{
+  "name": "voiceledger-server",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Stateless speech-to-transaction capture service for VoiceLedger",
+  "type": "module",
+  "main": "index.mjs",
+  "scripts": {
+    "start": "node index.mjs",
+    "dev": "node --watch index.mjs"
+  },
+  "engines": {
+    "node": ">=18.17"
+  }
+}
